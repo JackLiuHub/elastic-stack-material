@@ -1,0 +1,49 @@
+初始化系統
+- wget https://free.nchc.org.tw/fedora-epel/7/x86_64/e/epel-release-7-7.noarch.rpm
+- rpm -ivh epel-release-7-7.noarch.rpm
+- yum groupinstall 'Development Tools'
+- hostnamectl
+- hostnamectl set-hostname "new hostname"
+- sestatus
+- sudo vim /etc/sysconfig/selinux (reboot)
+- firewall-cmd --permanent --zone=public --add-rich-rule="rule family="ipv4" source address="192.168.19.0/24" port protocol="tcp" port="9200" accept"
+- firewall-cmd --permanent --zone=public --add-rich-rule="rule family="ipv4" source address="192.168.19.0/24" port protocol="tcp" port="9300" accept"
+- firewall-cmd --permanent --zone=public --add-rich-rule="rule family="ipv4" source address="192.168.19.0/24" port protocol="tcp" port="5601" accept"
+- firewall-cmd --zone=public --list-all
+- firewall-cmd --reload
+- vi /etc/security/limits.conf
+
+*       soft    nofile  65536
+*       hard    nofile  65536
+
+/* if you wnat to remove firewall rules
+sudo firewall-cmd  --permanent --zone=public --remove-port=9200/tcp
+sudo firewall-cmd --permanent --zone=public --remove-rich-rule="rule family="ipv4" source address="192.168.36.0/24" port protocol="tcp" port="9200" accept"
+*/
+
+--------------------------------------------------------------------------------------------------------
+Install Java
+
+Install JDK(RPM)
+- cd /tmp/
+- wget --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/8u91-b14/jdk-8u91-linux-x64.rpm"
+- sudo yum -y localinstall jdk-8u91-linux-x64.rpm (/usr/java/jdk1.8.0_91/jre/bin/java, and linked from/usr/bin/java)
+- sudo alternatives --config java
+
+Install JDK(TAR)
+
+- tar xzf jdk-8u91-linux-x64.tar.gz
+- sudo mv jdk1.8.0_91/ /usr/
+- sudo alternatives --install /usr/bin/java java /usr/jdk1.8.0_91/bin/java 2
+- sudo alternatives --config java
+- sudo alternatives --install /usr/bin/jar jar /usr/jdk1.8.0_91/bin/jar 2
+- sudo alternatives --install /usr/bin/javac javac /usr/jdk1.8.0_91/javac 2
+- sudo alternatives --set jar /usr/jdk1.8.0_91/bin/jar
+- sudo alternatives --set javac /usr/jdk1.8.0_91/bin/javac
+- sudo yum install glibc.i686
+- java -version
+- export JAVA_HOME=/usr/jdk1.8.0_91
+- export JRE_HOME=/usr/jdk1.8.0_91/jre
+- export PATH=$PATH:/usr/jdk1.8.0_91/bin:/usr/jdk1.8.0_91/jre/bin
+
+--------------------------------------------------------------------------------------------------------

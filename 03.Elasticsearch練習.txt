@@ -1,0 +1,276 @@
+#事前準備 
+#安裝kibana , sense
+#- wget https://download.elastic.co/kibana/kibana/kibana-4.5.3-1.x86_64.rpm
+#- yum localinstall kibana-4.5.3-1.x86_64.rpm
+#- /opt/kibana/bin/kibana plugin --install elastic/sense
+#- http://127.0.0.1:5601/app/sense
+
+
+#Create an index with settings and mapping
+
+PUT /ntc_index
+{
+  "settings": { 
+    "number_of_replicas": 1,
+    "number_of_shards": 3,
+    "analysis": {},
+    "refresh_interval": "1s"
+  },
+  "mappings": {
+    "ntc_type": {
+      "properties": {
+        "title": {
+          "type": "string",
+          "analyzer": "english"
+        }
+      }
+    }
+  }
+}
+
+#Get the mapping and the settings
+
+GET /ntc_index/_mapping
+GET /ntc_index/_settings
+
+#Update index settings dynamically
+
+PUT /ntc_index/_settings
+{
+  "index": {
+    "refresh_interval": "-1",
+    "number_of_replicas": 0
+  }
+}
+
+#Update an index by adding a field to a type
+
+PUT /ntc_index/_mapping/ntc_type
+{
+  "ntc_type": {
+    "properties": {
+      "tag": {
+        "type": "string",
+        "index": "not_analyzed"
+      }
+    }
+  }
+}
+
+
+#Create a document (auto-generated ID)
+
+POST /ntc_index/ntc_type
+{
+  "title": "Elastic is funny",
+  "tag": [
+    "lucene"
+  ]
+}
+
+#Create or update a document
+
+PUT /ntc_index/ntc_type/12abc
+{
+  "title": "Elastic is funny",
+  "tag": [
+    "lucene"
+  ]
+}
+
+#Get all document
+GET /ntc_index/ntc_type/_search/?q:*:*
+
+GET /ntc_index/ntc_type/_search
+{
+  "query": {
+    "match_all": {
+    }
+  }
+}
+
+#Get document by _id
+GET /ntc_index/ntc_type/AVZUA83mx8w7KUecazz-
+
+#Query document by conditions
+GET /ntc_index/ntc_type/_search
+{
+  "query": {
+    "match": {
+      tag: "lucene"
+    }
+  }
+}
+
+#Delete a document
+
+DELETE /ntc_index/ntc_type/12abc
+
+#Open and close indexes to save memory and CPU
+
+POST /ntc_index/_close
+POST /ntc_index/_open
+
+#Remove and create aliases
+#Useful
+POST /_aliases
+{
+  "actions": [
+    {
+      "add": {
+        "index": "ntc_index",
+        "alias": "bar",
+        "filter" : { "term" : { "tag" : "lucene" } }
+      }
+    }
+  ]
+}
+
+
+#List aliases
+
+GET /_aliases
+GET /ntc_index/_alias/*
+GET /*/_alias/*
+GET /*/_alias/foo
+
+#Create and list index warmer
+#Create a query that will be played on every new document:
+
+PUT /ntc_index/_warmer/my_warmer
+{
+  "query": {
+    "match_all": {}
+  },
+  "aggs": {
+    "costly_aggs": {
+      "terms": {
+        "field": "title"
+      }
+    }
+  }
+}
+GET /ntc_index/_warmer
+GET /ntc_index/_warmer/*
+
+#Indices monitoring and information
+
+GET /ntc_index/_stats
+GET /ntc_index/_segments
+GET /ntc_index/_recovery?pretty&human
+GET /ntc_index/_warmer/*
+
+#Indices status and management
+
+POST /ntc_index/_cache/clear
+POST /ntc_index/_refresh
+POST /ntc_index/_flush
+POST /ntc_index/_forcemerge
+POST /ntc_index/_upgrade
+GET /ntc_index/_upgrade?pretty&human
+
+#Debug and development
+
+#Queries
+
+#Get a detailed view of what a query do:
+
+GET /ntc_index/ntc_typ/_validate/query?explain
+{
+  "query": {
+    "match": {
+      "tag": "lucene"
+    }
+  }
+}
+
+#Get an explanation about a document matching or not:
+
+GET /ntc_index/ntc_type/1/_explain
+{
+  "query": {
+    "match": {
+      "title": "Smith"
+    }
+  }
+}
+
+#Analysis
+#Test how a content is tokenized in a field:
+
+GET /ntc_index/_analyze?field=title&text=powerful
+
+#Test analyzer token output by analyzer:
+
+GET /_analyze?analyzer=english&text=powerful
+
+#Cluster management and plugins
+#Cluster and node information
+
+GET /_cluster/health?pretty
+GET /_cluster/health?wait_for_status=yellow&timeout=50s
+GET /_cluster/state
+GET /_cluster/stats?human&pretty
+GET /_cluster/pending_tasks
+GET /_nodes
+GET /_nodes/stats
+GET /_nodes/nodeId1,nodeId2/stats
+
+#Moving shards manually
+
+#Ask the index ntc_index shard 0 of node1 to go to node2:
+#move one shard to another shard 
+POST /_cluster/reroute
+{
+  "commands": [
+    {
+      "move": {
+        "index": "ntc_index",
+        "shard": 0,
+        "from_node": "node1",
+        "to_node": "node2"
+      }
+    },
+    {
+      "allocate": {
+        "index": "ntc_index",
+        "shard": 1,
+        "node": "node3"
+      }
+    }
+  ]
+}
+
+#Updating settings
+
+#Change dynamically the minimum number of nodes to allow a master election, both persistent or not:
+
+PUT /_cluster/settings
+{
+  "persistent": {
+    "discovery.zen.minimum_master_nodes": 3
+  }
+}
+
+PUT /_cluster/settings
+{
+  "transient": {
+    "discovery.zen.minimum_master_nodes": 5
+  }
+}
+
+#Disable shard allocation, useful before a rolling restart:
+
+PUT /_cluster/settings
+{
+    "transient" : {
+        "cluster.routing.allocation.enable" : "none"
+    }
+}
+
+PUT /_cluster/settings
+{
+    "transient" : {
+        "cluster.routing.allocation.enable" : "all"
+    }
+}

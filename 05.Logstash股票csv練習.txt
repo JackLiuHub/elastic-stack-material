@@ -1,0 +1,63 @@
+- Install Java Runtime or JDK
+- 下載 https://download.elastic.co/logstash/logstash/packages/centos/logstash-all-plugins-2.3.4-1.noarch.rpm
+- yum localinstall logstash-all-plugins-2.3.4-1.noarch.rpm
+- 使用瀏覽器 http://finance.yahoo.com/quote/GOOG/history?period1=1092844800&period2=1469635200&interval=1d&filter=history&frequency=1d
+- 查詢公司，選擇適當的日期區間，download csv
+--------------------------------------------------------------
+- touch /tmp/doz.conf
+- vi /tmp/doz.conf
+--------------------------------------------------------------
+
+input {
+  file {
+    path => ["/tmp/*.csv"]
+    start_position => beginning
+	}
+}
+filter {
+  csv {
+    columns => [
+      "Date",
+      "Open",
+      "High",
+      "Low",
+      "Close",
+      "Volume",
+      "adj close"
+    ]
+    separator => ","
+    remove_field => ["Close"]
+  }
+  date{
+    match => ["Date", "yyyy-MM-dd"]
+    target => "@timestamp"
+  }
+  mutate {
+      convert => {
+      	"Open" => "float"
+      	"High" => "float"
+      	"Low" => "float"
+      	"Volume" => "integer"
+      	"adj close" => "float"
+      }
+  }
+  grok { 
+      match => { "path" => "%{GREEDYDATA}/%{GREEDYDATA:corporate}.csv" }
+      #add_field => { "corporate" => "%{filename}" }
+  }
+}
+
+output {
+    elasticsearch {
+        hosts => ["127.0.0.1:9200"]
+        action => "index"
+        index => "stock_index"
+    }
+    stdout { }
+}
+
+--------------------------------------------------------------
+command:
+$ /opt/logstash/bin/logstash -f /tmp/doz.conf -t
+$ /opt/logstash/bin/logstash -f /tmp/doz.conf --verbose
+

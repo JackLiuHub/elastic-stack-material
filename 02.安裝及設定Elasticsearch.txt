@@ -1,0 +1,90 @@
+ElasticSearch 安裝
+- cd /tmp
+- wget https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/rpm/elasticsearch/2.3.4/elasticsearch-2.3.4.rpm
+
+- yum localinstall elasticsearch-2.3.4.rpm
+- rpm -ql elasticsearch
+- cd /usr/share/elasticsearch/
+- ./bin/plugin install https://github.com/NLPchina/elasticsearch-sql/releases/download/2.3.4.0/elasticsearch-sql-2.3.4.0.zip
+- Install Bigdesk (original bigdesk doesn't support elasticsearch 2.x)
+
+- sudo mkdir -p /usr/share/elasticsearch/plugins/bigdesk
+- cd /usr/share/elasticsearch/plugins/bigdesk
+- sudo git clone https://github.com/lukas-vlcek/bigdesk _site
+- sed -i '142s/==/>=/' _site/js/store/BigdeskStore.js
+- sudo touch plugin-descriptor.properties
+- sudo vi plugin-descriptor.properties
+
+description=bigdesk - Live charts and statistics for Elasticsearch cluster.
+version=2.5.1
+site=true
+name=bigdesk
+
+- ./bin/plugin install mobz/elasticsearch-head
+- ./bin/plugin install lmenezes/elasticsearch-kopf
+- ./bin/plugin install royrusso/elasticsearch-HQ
+- /usr/share/elasticsearch/bin/plugin list
+--------------------------------------------------------------------------------------------------------
+- Centos 7 將 Elasticsearch 安裝為系統的 Service
+ systemctl daemon-reload
+ systemctl enable elasticsearch.service
+ systemctl start elasticsearch
+ systemctl status elasticsearch
+--------------------------------------------------------------------------------------------------------
+
+- curl -X GET http://127.0.0.1:9200/
+- http://127.0.0.1:9200/_plugin/head
+- http://127.0.0.1:9200/_plugin/sql/
+- http://127.0.0.1:9200/_plugin/kopf
+- http://127.0.0.1:9200/_plugin/hq/
+
+- vi /etc/elasticsearch/elasticsearch.yml
+--------------------------------------------------------------------------------------------------------
+cluster.name:es_cluster
+node.name:node01
+#node.name:${HOSTNAME}
+
+bootstrap.mlockall: true #lock JVM Swap when start
+
+discovery.zen.ping.multicast.enabled : false
+discovery.zen.ping.unicast.hosts: ["10.1.124.106", "10.1.124.105"]
+discovery.zen.minimum_master_nodes: 2
+
+#設置為30天過期
+indices.cache.filter.expire: 30d
+index.cache.filter: 30d
+
+index.number_of_shards: 3
+index.number_of_replicas: 1
+node.master: true
+node.data: true
+
+#Gateway
+gateway.type : local #
+
+# 設定bind的ip,可以是ipv4或ipv6的,預設為0.0.0.0 
+#network.bind_host: 192.168.0.1 
+# 設定其它節點和該節點溝通時的ip 
+#network.publish_host: 192.168.0.1 
+# 同時設定bind_host和publish_host上面兩個參數 
+#network.host: 192.168.0.1
+#transport.tcp.compress: true
+#http.max_content_length: 100mb
+
+
+--------------------------------------------------------------------------------------------------------
+command:
+$ systemctl restart elasticsearch
+
+--------------------------------------------------------------------------------------------------------
+- 檢查 ES RPM 組態檔清單: rpm -qc elasticsearch
+
+/etc/elasticsearch/elasticsearch.yml
+/etc/elasticsearch/logging.yml
+/etc/init.d/elasticsearch
+/etc/sysconfig/elasticsearch
+/usr/lib/sysctl.d/elasticsearch.conf
+/usr/lib/systemd/system/elasticsearch.service
+/usr/lib/tmpfiles.d/elasticsearch.conf
+
+- netstat -nltp
