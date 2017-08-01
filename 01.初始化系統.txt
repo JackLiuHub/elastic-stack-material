@@ -26,11 +26,11 @@ Install Java
 
 Install JDK(RPM)
 - cd /tmp/
-- wget --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/8u91-b14/jdk-8u91-linux-x64.rpm"
-- sudo yum -y localinstall jdk-8u91-linux-x64.rpm (/usr/java/jdk1.8.0_91/jre/bin/java, and linked from/usr/bin/java)
+- wget --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/8u144-b01/090f390dda5b47b9b721c7dfaa008135/jdk-8u144-linux-x64.rpm"
+- sudo yum -y localinstall jdk-8u144-linux-x64.rpm (/usr/java/jdk1.8.0_144/jre/bin/java, and linked from/usr/bin/java)
 - sudo alternatives --config java
 
-Install JDK(TAR)
+Install JDK(TAR)- * alternative JDK installation
 
 - tar xzf jdk-8u91-linux-x64.tar.gz
 - sudo mv jdk1.8.0_91/ /usr/
