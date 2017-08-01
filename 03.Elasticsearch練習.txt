@@ -2,6 +2,7 @@
 #安裝kibana , sense
 #- wget https://download.elastic.co/kibana/kibana/kibana-4.5.3-1.x86_64.rpm
 #- yum localinstall kibana-4.5.3-1.x86_64.rpm
+#- vi /opt/kibana/config/kibana.yml -> server.host
 #- /opt/kibana/bin/kibana plugin --install elastic/sense
 #- http://127.0.0.1:5601/app/sense
 
