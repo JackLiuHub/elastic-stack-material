@@ -1,29 +1,30 @@
 ElasticSearch 安裝
 - cd /tmp
-- wget https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/rpm/elasticsearch/2.3.4/elasticsearch-2.3.4.rpm
+- wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.2.3.rpm
 
-- yum localinstall elasticsearch-2.3.4.rpm
-- rpm -ql elasticsearch
-- cd /usr/share/elasticsearch/
-- ./bin/plugin install https://github.com/NLPchina/elasticsearch-sql/releases/download/2.3.4.0/elasticsearch-sql-2.3.4.0.zip
-- Install Bigdesk (original bigdesk doesn't support elasticsearch 2.x)
+- rpm -Uvh elasticsearch-6.2.3.rpm
+- rpm -ql elasticsearch # 查看安裝路徑
 
-- sudo mkdir -p /usr/share/elasticsearch/plugins/bigdesk
-- cd /usr/share/elasticsearch/plugins/bigdesk
-- sudo git clone https://github.com/lukas-vlcek/bigdesk _site
-- sed -i '142s/==/>=/' _site/js/store/BigdeskStore.js
-- sudo touch plugin-descriptor.properties
-- sudo vi plugin-descriptor.properties
+--------------------------------------------------------------------------------------------------------
+# 優化 JVM 設定 (一般設定為 Host 記憶體的一半)
+- vi /etc/elasticsearch/jvm.options
+	
+--------------------------------------------------------------------------------------------------------
+# 優化 Elasticsearch 設定
+- vi /usr/lib/systemd/system/elasticsearch.service
+	LimitMEMLOCK=infinity
 
-description=bigdesk - Live charts and statistics for Elasticsearch cluster.
-version=2.5.1
-site=true
-name=bigdesk
+- vi /etc/sysconfig/elasticsearch
+	MAX_LOCKED_MEMORY=unlimited
+	
+-------------------------------------------------------------------------------------------------------
+# 作業系統參數優化
+- vi /etc/security/limits.conf
+	*       soft    nofile  65536
+	*       hard    nofile  65536	
+	
 
-- ./bin/plugin install mobz/elasticsearch-head
-- ./bin/plugin install lmenezes/elasticsearch-kopf
-- ./bin/plugin install royrusso/elasticsearch-HQ
-- /usr/share/elasticsearch/bin/plugin list
+
 --------------------------------------------------------------------------------------------------------
 - Centos 7 將 Elasticsearch 安裝為系統的 Service
  systemctl daemon-reload
@@ -33,16 +34,13 @@ name=bigdesk
 --------------------------------------------------------------------------------------------------------
 
 - curl -X GET http://127.0.0.1:9200/
-- http://127.0.0.1:9200/_plugin/head
-- http://127.0.0.1:9200/_plugin/sql/
-- http://127.0.0.1:9200/_plugin/kopf
-- http://127.0.0.1:9200/_plugin/hq/
+
 
 - vi /etc/elasticsearch/elasticsearch.yml
 --------------------------------------------------------------------------------------------------------
 cluster.name:es_cluster
 node.name:node01
-#node.name:${HOSTNAME}
+#node.name: ${HOSTNAME}
 
 bootstrap.mlockall: true #lock JVM Swap when start
 
