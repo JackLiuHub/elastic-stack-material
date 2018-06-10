@@ -1,0 +1,49 @@
+- 下載 jdbc driver
+瀏覽器: https://dev.mysql.com/downloads/connector/j/
+
+command:
+$ wget "https://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-5.1.39.zip"
+$ unzip mysql-connector-java-5.1.39.zip
+$ cd mysql-connector-java-5.1.39
+$ mv mysql-connector-java-5.1.39-bin.jar /tmp
+
+$ cd /tmp
+$ touch jdbc_test.conf
+$ vi jdbc_test.conf
+-------------------------------
+input {
+  jdbc {
+    jdbc_driver_library => "/tmp/mysql-connector-java-5.1.39-bin.jar"
+    jdbc_driver_class => "com.mysql.jdbc.Driver"
+    jdbc_connection_string => "jdbc:mysql://192.168.19.101:3306/elk"
+    jdbc_user => "root"
+    jdbc_password => "1234"
+    last_run_metadata_path => "/etc/logstash/metadata/logstash_jdbc_last_run"
+    schedule => "*/1 * * * *"
+    #statement_filepath => "/tmp/query.sql"
+    
+    statement => "SELECT id, product_name, product_catetory,last_modify_date FROM product WHERE last_modify_date >= :sql_last_start"
+
+    #statement => "select id,product_name from product where last_modify_datatime >= DATE_SUB(NOW(),INTERVAL 1 MIN)"
+
+    jdbc_paging_enabled => "true"
+    jdbc_page_size => "500"
+  }
+}
+
+output {
+  elasticsearch {
+    index => "product_index"
+    document_type => "product_type"
+    document_id => "%{id}"
+    hosts => ['192.168.19.101']
+  }
+}
+--------------------------------
+
+
+SELECT id, product_name, product_catetory,last_modify_date FROM product;
+
+INSERT product (product_name, product_catetory,last_modify_date)values
+('iphone','apple','2016-08-07 14:01:12');
+
