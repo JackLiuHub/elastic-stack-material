@@ -2,7 +2,7 @@ ElasticSearch 安裝
 - cd /tmp
 - wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.2.3.rpm
 
-- rpm -Uvh elasticsearch-6.2.3.rpm
+- rpm -Uvh elasticsearch-6.2.3.rpm
 - rpm -ql elasticsearch # 查看安裝路徑
 
 --------------------------------------------------------------------------------------------------------
@@ -23,8 +23,6 @@ ElasticSearch 安裝
 	*       soft    nofile  65536
 	*       hard    nofile  65536	
 	
-
-
 --------------------------------------------------------------------------------------------------------
 - Centos 7 將 Elasticsearch 安裝為系統的 Service
  systemctl daemon-reload
@@ -39,14 +37,33 @@ ElasticSearch 安裝
 - vi /etc/elasticsearch/elasticsearch.yml
 --------------------------------------------------------------------------------------------------------
 cluster.name:es_cluster
-node.name:node01
+node.name: node01
 #node.name: ${HOSTNAME}
 
 bootstrap.mlockall: true #lock JVM Swap when start
 
+# 網路相關設定
+
+# network.host 隱含同時設定 bind_host 和 publish_host 兩個參數 
+# https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-network.html
+
+network.host: [_local_, "[::1]", _site_, "_eth0:ipv4_"]
+#network.host=10.1.124.106
+#network.host: 0.0.0.0
+#network.port=9200
+
+# 設定 bind 的 ip,可以是 ipv4 或 ipv6 的,預設與 network.host 值相同 
+network.bind_host: [_site_, _local_ , "_eth0:ipv4_"] # listen for incoming requests
+
+
+# 設定其它節點和該節點溝通時的 ip , single interface 只能有一個 IP 位置
+network.publish_host: 192.168.0.1 
+
+
 discovery.zen.ping.multicast.enabled : false
 discovery.zen.ping.unicast.hosts: ["10.1.124.106", "10.1.124.105"]
-discovery.zen.minimum_master_nodes: 2
+#discovery.zen.ping.unicast.hosts: ["10.1.124.106[9300]", "10.1.124.105"]
+discovery.zen.minimum_master_nodes: 2 # (Node 數量 / 2 +1)
 
 #設置為30天過期
 indices.cache.filter.expire: 30d
@@ -57,15 +74,7 @@ index.number_of_replicas: 1
 node.master: true
 node.data: true
 
-#Gateway
-gateway.type : local #
 
-# 設定bind的ip,可以是ipv4或ipv6的,預設為0.0.0.0 
-#network.bind_host: 192.168.0.1 
-# 設定其它節點和該節點溝通時的ip 
-#network.publish_host: 192.168.0.1 
-# 同時設定bind_host和publish_host上面兩個參數 
-#network.host: 192.168.0.1
 #transport.tcp.compress: true
 #http.max_content_length: 100mb
 
