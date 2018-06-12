@@ -2,6 +2,10 @@
 
 - wget https://artifacts.elastic.co/downloads/kibana/kibana-6.2.3-x86_64.rpm
 - rpm -Uvh kibana-6.2.3-x86_64.rpm
-- vi /etc/share/kibana/kibana.yml
+- vi /etc/kibana/kibana.yml
   server.host: "0.0.0.0"
   elasticsearch.url: "http://localhost:9200"
+-	systemctl daemon-reload
+	systemctl enable kibana.service
+	systemctl start kibana
+  systemctl status kibana

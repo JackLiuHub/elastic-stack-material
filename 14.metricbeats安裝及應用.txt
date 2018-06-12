@@ -1,0 +1,9 @@
+- curl -L -O https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-6.2.3-x86_64.rpm
+- sudo rpm -vi metricbeat-6.2.3-x86_64.rpm
+- vi /etc/metricbeat/metricbeat.yml
+- vi /etc/metricbeat/modules.d/system.yml
+- sudo metricbeat modules enable system (default enabled)
+- (optional)sudo metricbeat setup --dashboards
+- sudo metricbeat setup
+- sudo systemctl start metricbeat
+- sudo systemctl status metricbeat
