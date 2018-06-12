@@ -12,7 +12,7 @@ PUT /ntc_index
     "ntc_type": {
       "properties": {
         "title": {
-          "type": "string",
+          "type": "text",
           "analyzer": "english"
         }
       }
@@ -42,8 +42,8 @@ PUT /ntc_index/_mapping/ntc_type
   "ntc_type": {
     "properties": {
       "tag": {
-        "type": "string",
-        "index": "not_analyzed"
+        "type": "text",
+        "index" : true
       }
     }
   }

@@ -1,0 +1,10 @@
+- wget https://artifacts.elastic.co/downloads/logstash/logstash-6.2.4.rpm
+- rpm -Uvh logstash-6.2.4.rpm
+- systemctl daemon-reload
+  systemctl enable application.service  
+  systemctl start logstash
+  systemctl status logstash 
+
+- https://www.elastic.co/guide/en/logstash/current/configuration.html
+
+- /usr/share/logstash/bin/logstash -e 'input{stdin{}}output{stdout{codec=>rubydebug}}'
