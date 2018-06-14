@@ -52,3 +52,5 @@ Install JDK(TAR)- * alternative JDK installation
 - export PATH=$PATH:/usr/jdk1.8.0_91/bin:/usr/jdk1.8.0_91/jre/bin
 
 --------------------------------------------------------------------------------------------------------
+OpenJDK 替代使用
+yum install java-1.8.0-openjdk-devel java-1.8.0-openjdk

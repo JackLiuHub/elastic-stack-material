@@ -1,0 +1,17 @@
+GET _analyze
+{
+  "analyzer" : "standard",
+  "text" : ["中国的伟大时代来临了，欢迎参观北京大学PKU"]
+} 
+
+
+- https://github.com/medcl/elasticsearch-analysis-ik
+- ./bin/elasticsearch-plugin install https://github.com/medcl/elasticsearch-analysis-ik/releases/download/v6.2.3/elasticsearch-analysis-ik-6.2.3.zip
+
+
+
+GET _analyze
+{
+  "analyzer" : "ik_max_word",
+  "text" : ["中国的伟大时代来临了，欢迎参观北京大学PKU"]
+} 

@@ -6,5 +6,32 @@
   systemctl status logstash 
 
 - https://www.elastic.co/guide/en/logstash/current/configuration.html
+- mkdir -p /usr/share/logstash/config/
+- ln -s /etc/logstash/* /usr/share/logstash/config
+- chown -R logstash:logstash /usr/share/logstash/config/
+- /usr/share/logstash/bin/logstash -e 'input { stdin { } } output { stdout {} }'
 
-- /usr/share/logstash/bin/logstash -e 'input{stdin{}}output{stdout{codec=>rubydebug}}'
+# 讀取 /var/log/messages 內容並顯示在 console 
+- touch /usr/share/logstash/config/conf.d/messages.conf
+- vi /usr/share/logstash/config/conf.d/messages.conf
+    input {
+        file {
+            path => ["/var/log/messages"]
+            start_position => "beginning"
+        }
+    }
+    
+    output {
+        stdout {
+            codec => rubydebug
+        }
+    }
+
+- /usr/share/logstash/bin/logstash -f messages.conf
+
+# -t, --config.test_and_exit    
+    Check configuration for valid syntax and then exit. (default: false)
+-r, --config.reload.automatic 
+    Monitor configuration changes and reloadwhenever it is changed.
+    NOTE: use SIGHUP to manually reload the config (default: false)
+

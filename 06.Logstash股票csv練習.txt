@@ -58,6 +58,6 @@ output {
 
 --------------------------------------------------------------
 command:
-$ /opt/logstash/bin/logstash -f /tmp/doz.conf -t
-$ /opt/logstash/bin/logstash -f /tmp/doz.conf --verbose
+$ /usr/share/logstash/bin/logstash -f /tmp/doz.conf -t
+$ /usr/share/logstash/bin/logstash -f /tmp/doz.conf --verbose
 

@@ -1,0 +1,49 @@
+安裝結巴中文分詞套件
+- wget https://services.gradle.org/distributions/gradle-3.4.1-bin.zip
+- mkdir /opt/gradle
+- unzip -d /opt/gradle gradle-3.4.1-bin.zip
+- export PATH=$PATH:/opt/gradle/gradle-3.4.1/bin
+- gradle –v
+- git clone https://github.com/sing1ee/elasticsearch-jieba-plugin.git
+- cd /tmp/elasticsearch-jieba-plugin
+- vi /tmp/elasticsearch-jieba-plugin/src/main/resources/plugin-descriptor.properties
+    修改版本號碼
+- vi /tmp/elasticsearch-jieba-plugin/build.gradle
+    修改版本號碼
+- gradle pz
+- cp /tmp/elasticsearch-jieba-plugin/build/distributions/elasticsearch-jieba-plugin-6.2.3.zip /usr/share/elasticsearch/plugins
+- unzip /usr/share/elasticsearch/plugins/elasticsearch-jieba-plugin-6.2.3.zip
+- rm /usr/share/elasticsearch/plugins/elasticsearch-jieba-plugin-6.2.3.zip
+- mkdir -p /usr/share/elasticsearch/config/stopwords
+- cp /usr/share/elasticsearch/plugins/jieba/dic/stopwords.txt /usr/share/elasticsearch/config/stopwords
+- 
+- systemctl restart elasticsearch
+
+- open Kibna with browser
+PUT jieba_index
+{
+  "settings": {
+    "analysis": {
+      "filter": {
+        "jieba_stop": {
+          "type":        "stop",
+          "stopwords_path": "stopwords/stopwords.txt"
+        },
+        "jieba_synonym": {
+          "type":        "synonym",
+          "synonyms_path": "synonyms/synonyms.txt"
+        }
+      },
+      "analyzer": {
+        "my_ana": {
+          "tokenizer": "jieba_index",
+          "filter": [
+            "lowercase",
+            "jieba_stop",
+            "jieba_synonym"
+          ]
+        }
+      }
+    }
+  }
+}
