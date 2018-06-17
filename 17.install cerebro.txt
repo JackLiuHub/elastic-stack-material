@@ -1,0 +1,76 @@
+	• scp /etc/elasticsearch/elasticsearch.yml 192.168.5.251:/etc/elasticsearch/
+	• Install Cerebo (kopf) https://github.com/lmenezes/cerebro/releases
+	• tar xzf 
+	• mv to cerebo
+	• vi /etc/systemd/system/cerebro.service
+
+
+[Unit]
+Description=Cerebro
+[Service]
+Type=simple
+User=root
+Group=root
+ExecStart=//root/cerebro-0.6.6/bin/cerebro "-Dhttp.port=9201" "-Dpidfile.path=/var/run/cerebro.pid"
+Restart=always
+WorkingDirectory=/
+[Install]
+WantedBy=multi-user.target
+
+	• systemctl daemon-reload
+	• systemctl enable cerebro
+	• systemctl start cerebro
+	• http://localhost:9000
+	• vi cerebro/conf/application.conf
+
+
+# Secret will be used to sign session cookies, CSRF tokens and for other encryption utilities.
+# It is highly recommended to change this value before running cerebro in production.
+secret = "ki:s:[[@=Ag?QI`W2jMwkY:eqvrJ]JqoJyi2axj3ZvOv^/KavOT4ViJSv?6YY4[N"
+play.ws.ssl.loose.acceptAnyCertificate = true
+# Application base path
+basePath = "/"
+
+# Defaults to RUNNING_PID at the root directory of the app.
+# To avoid creating a PID file set this value to /dev/null
+#pidfile.path = "/var/run/cerebro.pid"
+pidfile.path=/dev/null
+
+# Rest request history max size per user
+rest.history.size = 50 // defaults to 50 if not specified
+
+# Path of local database file
+#data.path: "/var/lib/cerebro/cerebro.db"
+data.path = "./cerebro.db"
+
+# Authentication
+auth = {
+  # Example of LDAP authentication
+  #type: ldap
+    #settings: {
+      #url = "ldap://host:port"
+      #base-dn = "ou=active,ou=Employee"
+      #method  = "simple"
+      #user-domain = "domain.com"
+    #}
+  # Example of simple username/password authentication
+  type: basic
+    settings: {
+      username = "apt"
+      password = "apt@18"
+    }
+}
+
+# A list of known hosts
+hosts = [
+  {
+    host = "http://10.1.124.139:9200"
+    name = "octo-elk"
+    auth = {
+      username = "apt_work"
+      password = "aptinfra"
+    }
+  } 
+]
+
+
